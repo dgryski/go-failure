@@ -13,6 +13,7 @@ package failure
 
 import (
 	"math"
+	"sync"
 	"time"
 
 	"github.com/dgryski/go-onlinestats"
@@ -23,6 +24,7 @@ type Detector struct {
 	w          *onlinestats.Windowed
 	last       time.Time
 	minSamples int
+	mu         sync.Mutex
 }
 
 // New returns a new failure detector that considers the last windowSize
@@ -40,6 +42,8 @@ func New(windowSize, minSamples int) *Detector {
 
 // Ping registers a heart-beat at time now
 func (d *Detector) Ping(now time.Time) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	if !d.last.IsZero() {
 		d.w.Push(now.Sub(d.last).Seconds())
 	}
@@ -48,6 +52,8 @@ func (d *Detector) Ping(now time.Time) {
 
 // Phi calculates the suspicion level at time 'now' that the remote end has failed
 func (d *Detector) Phi(now time.Time) float64 {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	if d.w.Len() < d.minSamples {
 		return 0
 	}

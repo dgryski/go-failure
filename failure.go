@@ -1,7 +1,8 @@
 // Package failure implements the Phi Accrual Failure Detector
 /*
 
-Please see http://ddg.jaist.ac.jp/pub/HDY+04.pdf
+This package implements the paper "The φ Accrual Failure Detector" (2004)
+(available at http://hdl.handle.net/10119/4784).
 
 To use the failure detection algorithm, you need a heartbeat loop that will
 call Ping() at regular intervals.  At any point, you can call Phi() which will
